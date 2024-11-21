@@ -3,63 +3,99 @@
 # Exit script on error
 set -e
 
-# Stop Wings service
+# Stop and remove Wings service if it exists
 echo "Stopping Wings service..."
-sudo systemctl stop wings || true
+if systemctl is-active --quiet wings.service; then
+    sudo systemctl stop wings.service
+else
+    echo "Wings service is not running or doesn't exist."
+fi
 
-# Remove Wings systemd service
+# Remove Wings systemd service if it exists
 echo "Removing Wings systemd service..."
-sudo systemctl disable --now wings
-sudo rm -f /etc/systemd/system/wings.service
-sudo systemctl daemon-reload
+if systemctl list-units --full --all | grep -F wings.service; then
+    sudo systemctl disable wings.service
+    sudo rm /etc/systemd/system/wings.service
+    sudo systemctl daemon-reload
+else
+    echo "Wings service unit file doesn't exist."
+fi
 
-# Remove Docker
+# Remove Docker if installed
 echo "Removing Docker..."
-sudo systemctl stop docker
-sudo systemctl disable docker
-sudo apt-get purge -y docker docker-engine docker.io containerd runc
-sudo rm -rf /var/lib/docker
-sudo rm -rf /etc/docker
+if dpkg -l | grep -q docker; then
+    sudo systemctl stop docker
+    sudo systemctl disable docker
+    sudo apt-get remove --purge -y docker docker-engine docker.io containerd runc
+    sudo rm -rf /var/lib/docker
+else
+    echo "Docker is not installed."
+fi
 
-# Remove Wings binary
-echo "Removing Wings binary..."
-sudo rm -f /usr/local/bin/wings
+# Remove Pelican Panel files if they exist
+echo "Removing Pelican Panel files..."
+if [ -d /var/www/pelican ]; then
+    sudo rm -rf /var/www/pelican
+else
+    echo "Pelican Panel directory does not exist."
+fi
 
-# Remove Composer
+# Remove Pelican configuration files if they exist
+echo "Removing Pelican configuration files..."
+if [ -d /etc/pelican ]; then
+    sudo rm -rf /etc/pelican
+else
+    echo "Pelican configuration directory does not exist."
+fi
+
+# Remove Nginx configuration if it exists
+echo "Removing Nginx configuration..."
+if [ -f /etc/nginx/sites-enabled/pelican.conf ]; then
+    sudo rm /etc/nginx/sites-enabled/pelican.conf
+    sudo rm /etc/nginx/sites-available/pelican.conf
+    sudo systemctl restart nginx
+else
+    echo "Nginx configuration for Pelican does not exist."
+fi
+
+# Remove PHP packages if they exist
+echo "Removing PHP packages..."
+if dpkg -l | grep -q php8.3; then
+    sudo apt-get purge -y php8.3-{fpm,gd,mysql,mbstring,bcmath,xml,curl,zip,intl,sqlite3,cli}
+else
+    echo "PHP 8.3 packages are not installed."
+fi
+
+# Clean up dependencies if there are any
+echo "Cleaning up unused dependencies..."
+sudo apt-get autoremove -y
+sudo apt-get clean
+
+# Remove Composer if it exists
 echo "Removing Composer..."
-sudo rm -f /usr/local/bin/composer
+if [ -f /usr/local/bin/composer ]; then
+    sudo rm /usr/local/bin/composer
+else
+    echo "Composer is not installed."
+fi
 
-# Remove Nginx configuration and restore default
-echo "Removing custom Nginx configuration..."
-sudo rm -f /etc/nginx/sites-enabled/pelican.conf
-sudo rm -f /etc/nginx/sites-available/pelican.conf
-sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-sudo systemctl restart nginx
-
-# Remove the panel directory
-echo "Removing the Pelican Panel..."
-sudo rm -rf /var/www/pelican
-
-# Remove PHP 8.3 and related packages
-echo "Removing PHP 8.3 and related packages..."
-sudo apt-get purge -y php8.3-* php8.3-fpm
-sudo apt-get autoremove -y
-
-# Remove cron job
+# Remove Cron Job for www-data if it exists
 echo "Removing Cron job..."
-sudo crontab -u www-data -r
+if crontab -u www-data -l &>/dev/null; then
+    sudo crontab -u www-data -r
+else
+    echo "No cron jobs for www-data found."
+fi
 
-# Remove PHP artisan queue service setup
-echo "Removing queue service setup..."
-# No specific actions needed, it's handled by the system during the removal of Composer dependencies
+# Remove database (if installed)
+echo "Removing database..."
+# Uncomment and modify this section if you're using a database like MySQL or PostgreSQL
+# if dpkg -l | grep -q mysql-server; then
+#     sudo mysql -e "DROP DATABASE pelican;"
+#     sudo mysql -e "DROP USER 'pelican'@'localhost';"
+# else
+#     echo "MySQL server is not installed."
+# fi
 
-# Remove extra directories for panel and wings
-echo "Removing extra directories..."
-sudo rm -rf /etc/pelican
-sudo rm -rf /var/run/wings
-
-# Remove any additional dependencies installed by the script
-echo "Removing unnecessary dependencies..."
-sudo apt-get autoremove -y
-
-echo "Uninstallation complete. The system has been reverted to its previous state."
+# Final message
+echo "Uninstallation complete! All Pelican Panel and Wings files have been removed."
