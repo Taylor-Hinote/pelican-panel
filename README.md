@@ -31,7 +31,7 @@ chmod +x setup_pelican_panel.sh
 Run the script with sudo to ensure it has the necessary privileges:
 
 ```bash
-sudo ./setup_pelican_panel.sh
+sudo ./setup_pelican.sh
 ```
 
 ### 5. Access the Panel Installer
