@@ -12,13 +12,13 @@ Follow the steps below to clone the repository, make the script executable, and 
 Run the following command to clone this repository:
 
 ``` bash
-git clone https://github.com/Taylor-Hinote/pelicanpaneltest.git
+git clone https://github.com/Taylor-Hinote/pelican-panel.git
 ```
 ### 2. Navigate to the Repository Directory
 Change into the directory containing the script:
 
 ```bash
-cd pelicanpaneltest
+cd pelican-panel
 ```
 ### 3. Make the Script Executable
 Ensure the script has executable permissions:
