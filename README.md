@@ -50,6 +50,12 @@ chmod +x setup_pelican.sh
 sudo ./setup_pelican.sh
 ```
 
+### Uninstall Pelican
+```bash
+chmod +x uninstall_pelican.sh
+sudo ./uninstall_pelican.sh
+```
+
 
 Notes
 Make sure your NGINX server is correctly configured and restarted during the process.
