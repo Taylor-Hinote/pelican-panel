@@ -93,7 +93,13 @@ sudo bash -c '(crontab -l -u www-data 2>/dev/null; echo "* * * * * php /var/www/
 echo "Setting up Queue Service..."
 sudo php /var/www/pelican/artisan p:environment:queue-service
 
-# Install Docker
+# Inform the user to complete the panel installer
+echo "Please complete the web installer at http://<your-server-ip>/installer or http://localhost/installer before continuing."
+
+# Wait for user confirmation after completing the web-based installer
+read -p "Press Enter after you have completed the panel installation..."
+
+# Install Docker (after web installation is complete)
 echo "Installing Docker..."
 curl -sSL https://get.docker.com/ | CHANNEL=stable sudo sh
 sudo systemctl enable --now docker
@@ -139,4 +145,3 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now wings
 
 echo "Setup complete! Visit http://<your-server-ip>/installer or http://localhost/installer to finish the Panel installation."
-
