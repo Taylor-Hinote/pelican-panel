@@ -24,7 +24,7 @@ cd pelicanpaneltest
 Ensure the script has executable permissions:
 
 ```bash
-chmod +x setup_pelican_panel.sh
+chmod +x setup_pelican.sh
 ```
 
 ### 4. Run the Script
