@@ -42,6 +42,15 @@ Once the script completes, access the Pelican Panel installer in your web browse
 
 Replace <your-server-ip> with the actual IP address of your server.
 
+### Master Code Block
+```bash
+git clone https://github.com/Taylor-Hinote/pelican-panel.git
+cd pelican-panel
+chmod +x setup_pelican.sh
+sudo ./setup_pelican.sh
+```
+
+
 Notes
 Make sure your NGINX server is correctly configured and restarted during the process.
 Back up any critical data before running this script on a production server.
