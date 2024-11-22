@@ -19,11 +19,6 @@ echo "Installing Composer..."
 sudo curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 sudo composer install --no-dev --optimize-autoloader
 
-# Fix permissions for /var/www/pelican to ensure proper access
-echo "Fixing permissions for /var/www/pelican..."
-sudo chown -R www-data:www-data /var/www/pelican
-sudo chmod -R 775 /var/www/pelican
-
 # Configure Nginx
 echo "Configuring Nginx..."
 sudo rm /etc/nginx/sites-enabled/default
@@ -78,7 +73,7 @@ sudo systemctl restart nginx
 
 # Set permissions for the panel directory
 echo "Setting permissions for /var/www/pelican..."
-sudo chmod -R 755 /var/www/pelican/storage/* /var/www/pelican/bootstrap/cache/
+sudo chmod -R 755 storage/* bootstrap/cache/
 sudo chown -R www-data:www-data /var/www/pelican
 
 # Set up Panel environment
